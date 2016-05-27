@@ -59,7 +59,7 @@ public extension NSString {
 
 public class Youtube: NSObject {
   static let infoURL = "http://www.youtube.com/get_video_info?video_id="
-  static var userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.79 Safari/537.4"
+  static var userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36"
   /**
   Method for retrieving the youtube ID from a youtube URL
 
@@ -99,6 +99,9 @@ public class Youtube: NSObject {
     let request = NSMutableURLRequest(URL: url)
     request.timeoutInterval = 5.0
     request.setValue(userAgent, forHTTPHeaderField: "User-Agent")
+    request.setValue("http://m.youtube.com/watch?v=9qUMWFyYkBI", forHTTPHeaderField: "Referer")
+    request.setValue("http://m.youtube.com/watch?v=9qUMWFyYkBI", forHTTPHeaderField: "Referrer")
+    request.setValue("https://www.youtube.com", forHTTPHeaderField: "Origin")
     request.HTTPMethod = "GET"
     var responseString = NSString()
     let session = NSURLSession(configuration: NSURLSessionConfiguration.defaultSessionConfiguration())
@@ -113,6 +116,8 @@ public class Youtube: NSObject {
     dispatch_group_wait(group, DISPATCH_TIME_FOREVER)
     let parts = responseString.dictionaryFromQueryStringComponents()
     if parts.count > 0 {
+      print("vvvvvvvvvvvvvvvvvvvvvv")
+      print(parts)
       var videoTitle: String = ""
       var streamImage: String = ""
       if let title = parts["title"] as? String {
@@ -161,7 +166,7 @@ public class Youtube: NSObject {
           dispatch_async(dispatch_get_main_queue()) {
             completion?(videoInfo: videoInformation, error: nil)
           }
-        }else{
+        } else {
           dispatch_async(dispatch_get_main_queue()) {
             completion?(videoInfo: nil, error: NSError(domain: "com.player.youtube.backgroundqueue", code: 1001, userInfo: ["error": "Invalid YouTube URL"]))
           }

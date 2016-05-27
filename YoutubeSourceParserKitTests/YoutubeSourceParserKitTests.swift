@@ -104,18 +104,47 @@ class YoutubeSourceParserKitTests: XCTestCase {
       }
     }
   }
+  
+  func printStuff() {
+    print("bbbbbbbbbbbbbbbbbbbbbbbbbbb")
+  }
+  
+  func testH264videosWithOldYoutubeURL() {
+    let bad = "http://m.youtube.com/watch?v=9qUMWFyYkBI"
+    let good = "https://www.youtube.com/watch?v=FNf-IGmxElI"
+    let expectation = self.expectationWithDescription("fetch video url")
+    
+    if let videoURL = NSURL(string: bad) {
+      Youtube.h264videosWithYoutubeURL(videoURL, completion: { (videoInfo, error) -> Void in
+        XCTAssertNotNil(videoInfo, "video dictionary is nil")
+        if let info = videoInfo as [String:AnyObject]? {
+          if let quality = info["quality"] as? String {
+            XCTAssertEqual(quality, "hd720", "quality not equal")
+            expectation.fulfill()
+          }
+        }
+      })
+    }
+    
+    self.waitForExpectationsWithTimeout(5.0, handler: nil)
+  }
 
   func testVideoQuality(){
+    let expectation = self.expectationWithDescription("fetch video url")
+    
     if let videoURL = NSURL(string: "http://www.youtube.com/watch?v=1hZ98an9wjo") {
       Youtube.h264videosWithYoutubeURL(videoURL, completion: { (videoInfo, error) -> Void in
         XCTAssertNotNil(videoInfo, "video dictionary is nil")
         if let info = videoInfo as [String:AnyObject]? {
           if let quality = info["quality"] as? String {
             XCTAssertEqual(quality, "hd720", "quality not equal")
+            expectation.fulfill()
           }
         }
       })
     }
+    
+    self.waitForExpectationsWithTimeout(5.0, handler: nil)
   }
 
   func testItagControl(){
